@@ -1,5 +1,4 @@
 // Enhanced image service using curated real estate images
-import { getRandomPropertyImages } from './realEstateImages'
 
 // Cache for images to avoid repeated processing
 const imageCache = new Map<string, string[]>()
