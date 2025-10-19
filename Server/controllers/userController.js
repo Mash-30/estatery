@@ -349,6 +349,13 @@ const refreshToken = async (req, res) => {
 // Logout (remove refresh token)
 const logout = async (req, res) => {
   try {
+    // Fallback response if no database connection
+    if (!process.env.MONGODB_URI) {
+      return res.json({
+        message: 'Logout successful (demo mode)'
+      });
+    }
+
     const { refreshToken } = req.body;
     const user = req.user;
     
@@ -375,6 +382,13 @@ const logout = async (req, res) => {
 // Logout from all devices (clear all refresh tokens)
 const logoutAll = async (req, res) => {
   try {
+    // Fallback response if no database connection
+    if (!process.env.MONGODB_URI) {
+      return res.json({
+        message: 'Logged out from all devices successfully (demo mode)'
+      });
+    }
+
     const user = req.user;
     await user.clearRefreshTokens();
     

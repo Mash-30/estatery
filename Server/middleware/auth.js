@@ -15,6 +15,18 @@ const auth = async (req, res, next) => {
     
     const token = authHeader.replace('Bearer ', '');
     
+    // Demo mode fallback - allow demo tokens
+    if (!process.env.MONGODB_URI && token === 'demo-access-token') {
+      req.user = {
+        _id: 'demo-user',
+        email: 'demo@example.com',
+        firstName: 'Demo',
+        lastName: 'User',
+        role: 'buyer'
+      };
+      return next();
+    }
+    
     // Verify access token
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret');
     
