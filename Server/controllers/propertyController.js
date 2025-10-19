@@ -17,6 +17,16 @@ import {
 // Get all properties with advanced search and filtering
 const getAllProperties = async (req, res) => {
   try {
+    // Fallback response if no database connection
+    if (!process.env.MONGODB_URI) {
+      return res.json({
+        properties: [],
+        totalCount: 0,
+        totalPages: 0,
+        currentPage: 1,
+        message: 'Database not configured'
+      });
+    }
     const { 
       page = 1, 
       limit = 12, 
@@ -191,6 +201,14 @@ const getFeaturedProperties = async (req, res) => {
   try {
     const { limit = 6 } = req.query;
     
+    // Fallback response if no database connection
+    if (!process.env.MONGODB_URI) {
+      return res.json({
+        properties: [],
+        message: 'Database not configured'
+      });
+    }
+    
     // Check if we have properties in database, if not, seed with mock data
     const existingCount = await Property.countDocuments();
     if (existingCount === 0) {
@@ -214,6 +232,16 @@ const getFeaturedProperties = async (req, res) => {
 // Get property statistics
 const getPropertyStats = async (req, res) => {
   try {
+    // Fallback response if no database connection
+    if (!process.env.MONGODB_URI) {
+      return res.json({
+        totalProperties: 0,
+        totalAgents: 0,
+        totalClients: 0,
+        message: 'Database not configured'
+      });
+    }
+
     const allProperties = await Property.find({ isActive: true });
     const stats = getPropertyStatsFromService(allProperties);
     
