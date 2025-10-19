@@ -5,7 +5,10 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [
     react({
-      jsxImportSource: 'react'
+      jsxRuntime: 'classic',
+      babel: {
+        plugins: []
+      }
     })
   ],
   server: {
@@ -29,7 +32,8 @@ export default defineConfig({
     include: ['shadergradient', 'three', '@react-three/fiber', '@react-three/drei']
   },
   define: {
-    'process.env': {}
+    'process.env': {},
+    __BUILD_TIME__: JSON.stringify(new Date().toISOString())
   },
   resolve: {
     alias: {
