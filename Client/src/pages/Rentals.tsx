@@ -7,6 +7,7 @@ import SearchBar from '../components/SearchBar'
 import SearchResults from '../components/SearchResults'
 import PropertyImage from '../components/PropertyImage'
 import useDebounce from '../hooks/useDebounce'
+import { mockRentals } from '../data/mockData'
 
 interface RentalProperty {
   _id: string
@@ -126,31 +127,41 @@ const Rentals: React.FC = () => {
   const { data: response, isLoading, error } = useQuery({
     queryKey,
     queryFn: async () => {
-      const params = new URLSearchParams()
-      const searchFilters = { 
-        ...filters, 
-        search: debouncedSearch,
-        city: debouncedCity,
-        state: debouncedState,
-        minPrice: debouncedMinPrice,
-        maxPrice: debouncedMaxPrice
-      }
-      
-      Object.entries(searchFilters).forEach(([key, value]) => {
-        if (value && value !== '') {
-          if (Array.isArray(value)) {
-            value.forEach(v => params.append(key, v))
-          } else {
-            params.append(key, value)
-          }
+      try {
+        const params = new URLSearchParams()
+        const searchFilters = { 
+          ...filters, 
+          search: debouncedSearch,
+          city: debouncedCity,
+          state: debouncedState,
+          minPrice: debouncedMinPrice,
+          maxPrice: debouncedMaxPrice
         }
-      })
-      params.append('page', currentPage.toString())
-      params.append('sortBy', sortBy)
-      params.append('sortOrder', sortOrder)
-      
-      const response = await api.get(`/rentals?${params.toString()}`)
-      return response.data
+        
+        Object.entries(searchFilters).forEach(([key, value]) => {
+          if (value && value !== '') {
+            if (Array.isArray(value)) {
+              value.forEach(v => params.append(key, v))
+            } else {
+              params.append(key, value)
+            }
+          }
+        })
+        params.append('page', currentPage.toString())
+        params.append('sortBy', sortBy)
+        params.append('sortOrder', sortOrder)
+        
+        const response = await api.get(`/rentals?${params.toString()}`)
+        return response.data
+      } catch (error) {
+        console.warn('Failed to fetch rentals, using mock data')
+        return {
+          rentals: mockRentals,
+          totalCount: mockRentals.length,
+          totalPages: 1,
+          currentPage: 1
+        }
+      }
     },
     // Only refetch when debounced search changes, not on every keystroke
     enabled: true,

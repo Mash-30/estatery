@@ -23,6 +23,7 @@ import {
 } from 'lucide-react'
 import api from '../lib/api'
 import { usePropertyImages } from '../hooks/usePropertyImages'
+import { mockRentals } from '../data/mockData'
 
 interface RentalProperty {
   _id: string
@@ -99,8 +100,20 @@ const RentalDetail: React.FC = () => {
   const { data: response, isLoading, error } = useQuery({
     queryKey: ['rental', id],
     queryFn: async () => {
-      const response = await api.get(`/rentals/${id}`)
-      return response.data
+      try {
+        const response = await api.get(`/rentals/${id}`)
+        return response.data
+      } catch (error) {
+        console.warn('Failed to fetch rental details, using mock data')
+        const rental = mockRentals.find(r => r._id === id)
+        if (rental) {
+          return {
+            property: rental,
+            similarProperties: mockRentals.filter(r => r._id !== id).slice(0, 3)
+          }
+        }
+        throw new Error('Rental not found')
+      }
     },
     enabled: !!id
   })
