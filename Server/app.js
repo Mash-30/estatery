@@ -10,6 +10,8 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// CORS configuration updated for production
+
 // Middleware
 app.use(helmet());
 app.use(corsMiddleware);
