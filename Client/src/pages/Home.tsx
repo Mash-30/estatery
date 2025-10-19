@@ -6,6 +6,7 @@ import api from '../lib/api'
 import PropertyImage from '../components/PropertyImage'
 import HeroSection2 from '../components/HeroSection2'
 import CallToActionSection from '../components/CallToActionSection'
+import { mockProperties, mockStats } from '../data/mockData'
 
 interface Property {
   _id: string
@@ -33,8 +34,8 @@ const Home: React.FC = () => {
         const response = await api.get('/properties/featured?limit=6')
         return response.data.properties || []
       } catch (error) {
-        console.warn('Failed to fetch featured properties, using fallback data')
-        return []
+        console.warn('Failed to fetch featured properties, using mock data')
+        return mockProperties.slice(0, 6)
       }
     }
   })
@@ -46,8 +47,8 @@ const Home: React.FC = () => {
         const response = await api.get('/properties/stats')
         return response.data
       } catch (error) {
-        console.warn('Failed to fetch stats, using fallback data')
-        return { totalProperties: 0, totalAgents: 0, totalClients: 0 }
+        console.warn('Failed to fetch stats, using mock data')
+        return mockStats
       }
     }
   })
