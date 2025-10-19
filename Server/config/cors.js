@@ -17,12 +17,21 @@ const corsOptions = {
           'http://127.0.0.1:3000',
           'http://127.0.0.1:3001',
           'http://127.0.0.1:5173',
-          'http://127.0.0.1:8080'
+          'http://127.0.0.1:8080',
+          'https://estatery-k5nv.vercel.app', // Your Vercel client domain
+          'https://estatery.vercel.app' // Alternative Vercel domain
         ];
     
     // In development, allow all localhost origins
     if (process.env.NODE_ENV === 'development') {
       if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+        return callback(null, true);
+      }
+    }
+    
+    // In production, allow all Vercel domains
+    if (process.env.NODE_ENV === 'production') {
+      if (origin.includes('vercel.app') || origin.includes('vercel.com')) {
         return callback(null, true);
       }
     }

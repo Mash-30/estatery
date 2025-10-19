@@ -1,6 +1,6 @@
 import axios, { AxiosError } from 'axios'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://your-server-name.vercel.app/api'
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://real-estate-server.vercel.app/api'
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
