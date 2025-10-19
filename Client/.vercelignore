@@ -1,0 +1,9 @@
+# Vercel ignore file for clean builds
+node_modules/.cache
+.vite
+dist
+.next
+.turbo
+.cache
+*.log
+.DS_Store

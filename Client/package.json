@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "build:check": "tsc --noEmit",
-    "build:clean": "rm -rf dist && rm -rf node_modules/.vite && vite build",
+    "build:clean": "rm -rf dist && rm -rf node_modules/.vite && rm -rf node_modules/.cache && vite build",
+    "build:vercel": "rm -rf dist && rm -rf node_modules/.vite && rm -rf node_modules/.cache && npm ci && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },

@@ -5,7 +5,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [
     react({
-      jsxRuntime: 'classic',
+      jsxImportSource: 'react',
       babel: {
         plugins: []
       }
@@ -27,6 +27,9 @@ export default defineConfig({
         }
       }
     }
+  },
+  esbuild: {
+    jsx: 'automatic'
   },
   optimizeDeps: {
     include: ['shadergradient', 'three', '@react-three/fiber', '@react-three/drei']
