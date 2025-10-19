@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
+import { getDemoUser } from '../services/demoUserService.js';
 
 // Main authentication middleware
 const auth = async (req, res, next) => {
@@ -16,15 +17,19 @@ const auth = async (req, res, next) => {
     const token = authHeader.replace('Bearer ', '');
     
     // Demo mode fallback - allow demo tokens
-    if (!process.env.MONGODB_URI && token === 'demo-access-token') {
-      req.user = {
-        _id: 'demo-user',
-        email: 'demo@example.com',
-        firstName: 'Demo',
-        lastName: 'User',
-        role: 'buyer'
-      };
-      return next();
+    if (!process.env.MONGODB_URI && token.startsWith('demo-access-')) {
+      const userId = token.replace('demo-access-', '');
+      const user = getDemoUser(userId);
+      
+      if (user) {
+        req.user = user;
+        return next();
+      } else {
+        return res.status(401).json({ 
+          message: 'Invalid demo token. User not found.',
+          code: 'INVALID_DEMO_TOKEN'
+        });
+      }
     }
     
     // Verify access token

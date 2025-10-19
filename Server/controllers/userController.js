@@ -1,6 +1,16 @@
 import User from '../models/User.js';
 import { validationResult } from 'express-validator';
 import jwt from 'jsonwebtoken';
+import { 
+  createDemoUser, 
+  getDemoUser, 
+  getDemoUserByEmail,
+  createDemoSession,
+  getDemoSession,
+  updateSessionAccess,
+  removeDemoSession,
+  clearUserSessions
+} from '../services/demoUserService.js';
 
 // Get all users (admin only)
 const getAllUsers = async (req, res) => {
@@ -159,20 +169,43 @@ const register = async (req, res) => {
       });
     }
     
-    // Fallback response if no database connection
+    // Demo mode - create user in memory
     if (!process.env.MONGODB_URI) {
+      const { email, firstName, lastName, phone, role } = req.body;
+      
+      // Check if user already exists
+      const existingUser = getDemoUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ 
+          message: 'User already exists with this email',
+          code: 'USER_EXISTS'
+        });
+      }
+      
+      // Create new demo user
+      const user = createDemoUser({ email, firstName, lastName, phone, role });
+      
+      // Create session
+      const session = createDemoSession(user._id);
+      
+      // Generate demo tokens with real user ID
+      const accessToken = `demo-access-${user._id}`;
+      const refreshToken = `demo-refresh-${session.sessionId}`;
+      
       return res.status(201).json({
-        message: 'User registration simulated (database not configured)',
+        message: 'User registered successfully (demo mode)',
         user: {
-          id: 'demo-user',
-          email: req.body.email,
-          firstName: req.body.firstName,
-          lastName: req.body.lastName,
-          role: req.body.role || 'buyer'
+          _id: user._id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          phone: user.phone,
+          role: user.role,
+          createdAt: user.createdAt
         },
         tokens: {
-          accessToken: 'demo-access-token',
-          refreshToken: 'demo-refresh-token'
+          accessToken,
+          refreshToken
         }
       });
     }
@@ -238,20 +271,41 @@ const login = async (req, res) => {
       });
     }
     
-    // Fallback response if no database connection
+    // Demo mode - authenticate user from memory
     if (!process.env.MONGODB_URI) {
+      const { email, password } = req.body;
+      
+      // Find user by email
+      const user = getDemoUserByEmail(email);
+      if (!user) {
+        return res.status(401).json({
+          message: 'Invalid email or password',
+          code: 'INVALID_CREDENTIALS'
+        });
+      }
+      
+      // In demo mode, accept any password
+      // Create new session
+      const session = createDemoSession(user._id);
+      
+      // Generate demo tokens with real user ID
+      const accessToken = `demo-access-${user._id}`;
+      const refreshToken = `demo-refresh-${session.sessionId}`;
+      
       return res.json({
-        message: 'User login simulated (database not configured)',
+        message: 'Login successful (demo mode)',
         user: {
-          id: 'demo-user',
-          email: req.body.email,
-          firstName: 'Demo',
-          lastName: 'User',
-          role: 'buyer'
+          _id: user._id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          phone: user.phone,
+          role: user.role,
+          createdAt: user.createdAt
         },
         tokens: {
-          accessToken: 'demo-access-token',
-          refreshToken: 'demo-refresh-token'
+          accessToken,
+          refreshToken
         }
       });
     }
@@ -349,8 +403,16 @@ const refreshToken = async (req, res) => {
 // Logout (remove refresh token)
 const logout = async (req, res) => {
   try {
-    // Fallback response if no database connection
+    // Demo mode - remove session
     if (!process.env.MONGODB_URI) {
+      const { refreshToken } = req.body;
+      const user = req.user;
+      
+      if (refreshToken && refreshToken.startsWith('demo-refresh-')) {
+        const sessionId = refreshToken.replace('demo-refresh-', '');
+        removeDemoSession(sessionId);
+      }
+      
       return res.json({
         message: 'Logout successful (demo mode)'
       });
@@ -382,10 +444,13 @@ const logout = async (req, res) => {
 // Logout from all devices (clear all refresh tokens)
 const logoutAll = async (req, res) => {
   try {
-    // Fallback response if no database connection
+    // Demo mode - clear all user sessions
     if (!process.env.MONGODB_URI) {
+      const user = req.user;
+      const clearedCount = clearUserSessions(user._id);
+      
       return res.json({
-        message: 'Logged out from all devices successfully (demo mode)'
+        message: `Logged out from all devices successfully (demo mode) - ${clearedCount} sessions cleared`
       });
     }
 
