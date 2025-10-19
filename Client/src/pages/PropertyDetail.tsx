@@ -4,7 +4,6 @@ import { useQuery } from '@tanstack/react-query'
 import { ArrowLeft, MapPin, Bed, Bath, Square, Calendar, User, Heart, Share2, Phone, Mail, Home as HomeIcon, Car, Thermometer, Shield, Eye, ChevronLeft, ChevronRight } from 'lucide-react'
 import api from '../lib/api'
 import { usePropertyImages } from '../hooks/usePropertyImages'
-import { mockProperties } from '../data/mockData'
 
 interface Property {
   _id: string
@@ -68,20 +67,8 @@ const PropertyDetail: React.FC = () => {
   const { data: response, isLoading, error } = useQuery({
     queryKey: ['property', id],
     queryFn: async () => {
-      try {
-        const response = await api.get(`/properties/${id}`)
-        return response.data
-      } catch (error) {
-        console.warn('Failed to fetch property details, using mock data')
-        const property = mockProperties.find(p => p._id === id)
-        if (property) {
-          return {
-            property,
-            similarProperties: mockProperties.filter(p => p._id !== id).slice(0, 3)
-          }
-        }
-        throw new Error('Property not found')
-      }
+      const response = await api.get(`/properties/${id}`)
+      return response.data
     },
     enabled: !!id
   })
