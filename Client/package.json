@@ -5,10 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build --mode production",
     "build:check": "tsc --noEmit",
     "build:clean": "rm -rf dist && rm -rf node_modules/.vite && rm -rf node_modules/.cache && vite build",
-    "build:vercel": "rm -rf dist && rm -rf node_modules/.vite && rm -rf node_modules/.cache && npm ci && vite build",
+    "build:vercel": "rm -rf dist && rm -rf node_modules/.vite && rm -rf node_modules/.cache && npm ci && vite build --mode production --minify false",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },

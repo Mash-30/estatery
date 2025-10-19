@@ -29,7 +29,8 @@ export default defineConfig({
     }
   },
   esbuild: {
-    jsx: 'automatic'
+    jsx: 'automatic',
+    target: 'es2020'
   },
   optimizeDeps: {
     include: ['shadergradient', 'three', '@react-three/fiber', '@react-three/drei']
