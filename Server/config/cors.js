@@ -20,6 +20,7 @@ const corsOptions = {
           'http://127.0.0.1:8080',
           'https://estatery-k5nv.vercel.app', // Your Vercel client domain
           'https://estatery-l8jg.vercel.app', // Your new Vercel client domain
+          'https://estatery-inky.vercel.app', // Your server domain
           'https://estatery.vercel.app' // Alternative Vercel domain
         ];
     
