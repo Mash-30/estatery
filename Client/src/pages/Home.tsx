@@ -26,19 +26,29 @@ interface Property {
 }
 
 const Home: React.FC = () => {
-  const { data: featuredProperties, isLoading: featuredLoading } = useQuery({
+  const { data: featuredProperties = [], isLoading: featuredLoading } = useQuery({
     queryKey: ['featured-properties'],
     queryFn: async () => {
-      const response = await api.get('/properties/featured?limit=6')
-      return response.data.properties
+      try {
+        const response = await api.get('/properties/featured?limit=6')
+        return response.data.properties || []
+      } catch (error) {
+        console.warn('Failed to fetch featured properties, using fallback data')
+        return []
+      }
     }
   })
 
-  const { data: stats } = useQuery({
+  const { data: stats = { totalProperties: 0, totalAgents: 0, totalClients: 0 } } = useQuery({
     queryKey: ['property-stats'],
     queryFn: async () => {
-      const response = await api.get('/properties/stats')
-      return response.data
+      try {
+        const response = await api.get('/properties/stats')
+        return response.data
+      } catch (error) {
+        console.warn('Failed to fetch stats, using fallback data')
+        return { totalProperties: 0, totalAgents: 0, totalClients: 0 }
+      }
     }
   })
 
