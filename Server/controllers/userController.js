@@ -159,6 +159,24 @@ const register = async (req, res) => {
       });
     }
     
+    // Fallback response if no database connection
+    if (!process.env.MONGODB_URI) {
+      return res.status(201).json({
+        message: 'User registration simulated (database not configured)',
+        user: {
+          id: 'demo-user',
+          email: req.body.email,
+          firstName: req.body.firstName,
+          lastName: req.body.lastName,
+          role: req.body.role || 'buyer'
+        },
+        tokens: {
+          accessToken: 'demo-access-token',
+          refreshToken: 'demo-refresh-token'
+        }
+      });
+    }
+    
     const { email, password, firstName, lastName, phone, role } = req.body;
     
     // Check if user already exists
@@ -217,6 +235,24 @@ const login = async (req, res) => {
       return res.status(400).json({ 
         message: 'Validation failed',
         errors: errors.array() 
+      });
+    }
+    
+    // Fallback response if no database connection
+    if (!process.env.MONGODB_URI) {
+      return res.json({
+        message: 'User login simulated (database not configured)',
+        user: {
+          id: 'demo-user',
+          email: req.body.email,
+          firstName: 'Demo',
+          lastName: 'User',
+          role: 'buyer'
+        },
+        tokens: {
+          accessToken: 'demo-access-token',
+          refreshToken: 'demo-refresh-token'
+        }
       });
     }
     
